@@ -1,15 +1,23 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 public class Asteroid : MonoBehaviour
 {
-    private SpriteRenderer spriteRenderer; 
+    private SpriteRenderer spriteRenderer;
     private Rigidbody2D rb;
+
+    private Material defaultMaterial;
+    [SerializeField] private Material whiteMaterial;
+
+    [SerializeField] private GameObject destroyEffect;
+    [SerializeField] private int lives;
     private PolygonCollider2D polygonCollider;
     [SerializeField] private Sprite[] asteroidSprites;
 
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        defaultMaterial = spriteRenderer.material;
         rb = GetComponent<Rigidbody2D>();
 
         spriteRenderer.sprite = asteroidSprites[Random.Range(0, asteroidSprites.Length)];
@@ -45,11 +53,31 @@ public class Asteroid : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        float moveX = (GameManager.Instance.worldSpeed * PlayerController.Instance.boost ) * Time.deltaTime;
+        float moveX = (GameManager.Instance.worldSpeed * PlayerController.Instance.boost) * Time.deltaTime;
         transform.position += new Vector3(-moveX, 0);
         if (transform.position.x < -11)
         {
             Destroy(gameObject);
-        }   
+        }
+    }
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            spriteRenderer.material = whiteMaterial;
+            StartCoroutine("ResetMaterial");
+            lives--;
+            if (lives <= 0)
+            {
+                Instantiate(destroyEffect, transform.position, Quaternion.identity);
+                Destroy(gameObject);
+            }
+        }
+
+    }
+    IEnumerator ResetMaterial()
+    {
+        yield return new WaitForSeconds(0.2f);
+        spriteRenderer.material = defaultMaterial;
     }
 }

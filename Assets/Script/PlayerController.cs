@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -19,6 +20,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float maxHealth;
     [SerializeField] private GameObject destroyEffect;
 
+    private SpriteRenderer spriteRenderer;
+    private Material defaultMaterial;
+    [SerializeField] private Material whiteMaterial;
+
+
     void Awake()
     {
         if (Instance == null)
@@ -34,6 +40,9 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         playerRb = GetComponent<Rigidbody2D>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        defaultMaterial = spriteRenderer.material;
+
         energy = maxEnergy;
         UIController.Instance.UpdateEnergySlider(energy, maxEnergy);
         health = maxHealth;
@@ -108,12 +117,19 @@ public class PlayerController : MonoBehaviour
     {
         health -= damage;
         UIController.Instance.UpdateHealthSlider(health, maxHealth);
+        spriteRenderer.material = whiteMaterial;
+        StartCoroutine("ResetMaterial");
         if (health <= 0)
         {
             boost = 0f;
             gameObject.SetActive(false);
             Instantiate(destroyEffect, transform.position, transform.rotation);
         }
-        
+
+    }
+    IEnumerator ResetMaterial()
+    {
+        yield return new WaitForSeconds(0.2f);
+        spriteRenderer.material = defaultMaterial;
     }
 }
