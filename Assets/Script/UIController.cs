@@ -12,6 +12,11 @@ public class UIController : MonoBehaviour
     [SerializeField] private Slider healthSlider;
     [SerializeField] private TMP_Text healthText;
 
+    [SerializeField] private Slider experienceSlider;
+    [SerializeField] private TMP_Text experienceText;
+
+    public GameObject pauseMenu;
+
     void Awake()
     {
         if (Instance == null)
@@ -21,6 +26,11 @@ public class UIController : MonoBehaviour
         else
         {
             Destroy(gameObject);
+        }
+        // ensure the pause menu is hidden when the game starts
+        if (pauseMenu != null)
+        {
+            pauseMenu.SetActive(false);
         }
     }
 
@@ -39,5 +49,13 @@ public class UIController : MonoBehaviour
         int cur = Mathf.Clamp(Mathf.RoundToInt(current), 0, Mathf.RoundToInt(max));
         healthSlider.value = cur;
         healthText.text = cur + " / " + Mathf.RoundToInt(max);
+    }
+     public void UpdateExperienceSlider(float current, float max)
+    {
+        // ensure slider max is set first, then assign a clamped integer value
+        experienceSlider.maxValue = max;
+        int cur = Mathf.Clamp(Mathf.RoundToInt(current), 0, Mathf.RoundToInt(max));
+        experienceSlider.value = cur;
+        experienceText.text = cur + " / " + Mathf.RoundToInt(max);
     }
 }

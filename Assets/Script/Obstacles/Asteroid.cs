@@ -53,24 +53,26 @@ public class Asteroid : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        float moveX = (GameManager.Instance.worldSpeed * PlayerController.Instance.boost) * Time.deltaTime;
+        float moveX = GameManager.Instance.worldSpeed * Time.deltaTime;
         transform.position += new Vector3(-moveX, 0);
         if (transform.position.x < -11)
         {
             Destroy(gameObject);
         }
     }
+    //Va chạm với player(tàu vũ trụ) hoặc missile(đạn)
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        if (collision.gameObject.CompareTag("Player") || collision.gameObject.CompareTag("Missile"))
+
         {
             spriteRenderer.material = whiteMaterial;
             StartCoroutine("ResetMaterial");
             lives--;
             if (lives <= 0)
             {
-                Instantiate(destroyEffect, transform.position, Quaternion.identity);
-                Destroy(gameObject);
+                Instantiate(destroyEffect, transform.position, transform.rotation);
+                Destroy(gameObject);    
             }
         }
 

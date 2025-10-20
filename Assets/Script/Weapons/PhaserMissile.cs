@@ -2,11 +2,15 @@ using UnityEngine;
 
 public class PhaserMissile : MonoBehaviour
 {
-
+    PhaserWeapon weapon;
+    void Start()
+    {
+        weapon = PhaserWeapon.Instance;
+    }
     // Update is called once per frame
     void Update()
     {
-        transform.position += new Vector3(PhaserWeapon.Instance.speed * Time.deltaTime, 0f);
+        transform.position += new Vector3(weapon.stats[weapon.weaponLevel].speed * Time.deltaTime, 0f);
         if (transform.position.x > 9)
         {
             gameObject.SetActive(false);

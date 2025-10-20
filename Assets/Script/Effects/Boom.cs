@@ -8,7 +8,17 @@ public class Boom : MonoBehaviour
     void Start()
     {
         animator = GetComponent<Animator>();
-        Destroy(gameObject, animator.GetCurrentAnimatorStateInfo(0).length);    
+        float destroyDelay = 1f; // default fallback
+        if (animator != null && animator.runtimeAnimatorController != null)
+        {
+            destroyDelay = animator.GetCurrentAnimatorStateInfo(0).length;
+        }
+        Destroy(gameObject, destroyDelay);
+    }
+    void Update()
+    {
+        float moveX = GameManager.Instance.worldSpeed  * Time.deltaTime;
+        transform.position += new Vector3(-moveX, 0);
     }
     
 }

@@ -3,7 +3,7 @@ using UnityEngine;
 public class ParallaxBackground : MonoBehaviour
 {
     [SerializeField] private float moveSpeed;
-    float backgoundImageWidth;
+    private float backgoundImageWidth;
 
     void Start()
     {
@@ -14,9 +14,9 @@ public class ParallaxBackground : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        float moveX = moveSpeed * PlayerController.Instance.boost * Time.deltaTime;
+        float moveX = moveSpeed * Time.deltaTime;
         transform.position += new Vector3(moveX, 0);
-        if (Mathf.Abs(transform.position.x) - 5 > 0)
+        if (Mathf.Abs(transform.position.x) > 5)
         {
             transform.position = new Vector3(0f, transform.position.y);
         }

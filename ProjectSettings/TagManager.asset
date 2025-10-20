@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Obstacle
   - Missile
+  - Star
+  - Score
+  - Results
   layers:
   - Default
   - TransparentFX
@@ -16,8 +19,8 @@ TagManager:
   - Player
   - LevelBoundaries
   - Obstacle
-  - 
-  - 
+  - Star
+  - Missile
   - 
   - 
   - 
@@ -49,11 +52,11 @@ TagManager:
   - name: Player
     uniqueID: 1923421631
     locked: 0
-  - name: UI
-    uniqueID: 3762996117
-    locked: 0
   - name: Objects
     uniqueID: 438693551
+    locked: 0
+  - name: UI
+    uniqueID: 3762996117
     locked: 0
   m_RenderingLayers:
   - Default

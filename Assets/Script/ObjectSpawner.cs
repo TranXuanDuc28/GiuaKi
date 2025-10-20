@@ -11,7 +11,7 @@ public class ObjectSpawner : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        spawnTimer += Time.deltaTime * PlayerController.Instance.boost;
+        spawnTimer += Time.deltaTime * GameManager.Instance.worldSpeed;
         if (spawnTimer >= spawnInterval)
         {
             SpawnObject();

@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Collections.Generic;
+using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -8,9 +10,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D playerRb;
     private Vector2 playerDirection;
     [SerializeField] private float moveSpeed;
-    public float boost = 1f;
-    private float boostPower = 5f;
-    private bool boosting = false;
+    public bool boosting = false;
 
     [SerializeField] private float energy;
     [SerializeField] private float maxEnergy;
@@ -19,6 +19,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float health;
     [SerializeField] private float maxHealth;
     [SerializeField] private GameObject destroyEffect;
+
+    [SerializeField] private int experiencePoints;
+    [SerializeField] private int currentLevel;
+    [SerializeField] private int maxLevel;
+    [SerializeField] private List<int> playerLevelUps;
+
 
     private SpriteRenderer spriteRenderer;
     private Material defaultMaterial;
@@ -43,10 +49,17 @@ public class PlayerController : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         defaultMaterial = spriteRenderer.material;
 
+        for(int i = playerLevelUps.Count; i < maxLevel; i++)
+        {
+            playerLevelUps.Add(Mathf.CeilToInt(playerLevelUps[playerLevelUps.Count - 1] * 1.1f + 15));
+        }
+
         energy = maxEnergy;
         UIController.Instance.UpdateEnergySlider(energy, maxEnergy);
         health = maxHealth;
         UIController.Instance.UpdateHealthSlider(health, maxHealth);
+        experiencePoints = 0;
+        UIController.Instance.UpdateExperienceSlider(experiencePoints, playerLevelUps[currentLevel]);
         
     }
 
@@ -66,7 +79,7 @@ public class PlayerController : MonoBehaviour
             ExitBoost();
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetButtonDown("Fire1")) 
+        if (Input.GetKeyDown(KeyCode.F) || Input.GetKey(KeyCode.G)) 
         {
             PhaserWeapon.Instance.Shoot();
         }
@@ -77,7 +90,7 @@ public class PlayerController : MonoBehaviour
 
         if (boosting)
         {
-            if(energy >= 0.2f) energy -= 0.2f;
+            if(energy >= 0.5f) energy -= 0.5f;
             else
             {
                 ExitBoost();
@@ -94,14 +107,14 @@ public class PlayerController : MonoBehaviour
     private void EnterBoost()
     {
         if(energy > 10){
-            boost = boostPower;
+           GameManager.Instance.SetWorldSpeed(7f);
             boosting = true;
         }
         
     }
     private void ExitBoost()
     {
-        boost = 1f;
+        GameManager.Instance.SetWorldSpeed(1f);
         boosting = false;
     }
 
@@ -121,11 +134,36 @@ public class PlayerController : MonoBehaviour
         StartCoroutine("ResetMaterial");
         if (health <= 0)
         {
-            boost = 0f;
+            ExitBoost();
+            GameManager.Instance.SetWorldSpeed(0f);
             gameObject.SetActive(false);
             Instantiate(destroyEffect, transform.position, transform.rotation);
+            GameManager.Instance.GameResult(false);
         }
 
+    }
+    public void GetExperience(int exp)
+    {
+        experiencePoints += exp;
+        UIController.Instance.UpdateExperienceSlider(experiencePoints, playerLevelUps[currentLevel]);
+        if(experiencePoints > playerLevelUps[currentLevel])
+        {
+            LevelUp();
+        }
+    }
+    public void LevelUp()
+    {
+        experiencePoints -= playerLevelUps[currentLevel];
+        if (currentLevel < maxLevel - 1)
+        {
+            currentLevel++;
+        }
+        UIController.Instance.UpdateExperienceSlider(experiencePoints, playerLevelUps[currentLevel]);
+        PhaserWeapon.Instance.LevelUpWeapon();
+        //maxHealth++;
+        //health = maxHealth;
+        health++;
+        UIController.Instance.UpdateHealthSlider(health, maxHealth);   
     }
     IEnumerator ResetMaterial()
     {
