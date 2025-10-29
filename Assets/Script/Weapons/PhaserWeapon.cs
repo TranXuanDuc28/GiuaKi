@@ -36,6 +36,9 @@ public class PhaserWeapon : Weapon
         {
             GameObject missile = objectPooler.GetPooledObject();
             float yPos = transform.position.y;
+            
+            // Phát âm thanh cho mỗi viên đạn với PlayOneShot
+            AudioManager.Instance.PlayPooler();
 
             if (stats[weaponLevel].amount > 1)
             {

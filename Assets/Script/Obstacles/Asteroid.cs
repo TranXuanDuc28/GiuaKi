@@ -14,6 +14,10 @@ public class Asteroid : MonoBehaviour
     private PolygonCollider2D polygonCollider;
     [SerializeField] private Sprite[] asteroidSprites;
 
+    // Thêm biến cho phép điều chỉnh độ khó
+    public float speedMultiplier = 1f;
+    public int baseHealth = 1;
+
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -26,10 +30,18 @@ public class Asteroid : MonoBehaviour
         polygonCollider = gameObject.AddComponent<PolygonCollider2D>();
         UpdateColliderShape();
 
-        // Random hướng di chuyển
+        // Áp dụng độ khó từ level
+        lives = baseHealth;
+        if (LevelManager.Instance != null)
+        {
+            speedMultiplier = LevelManager.Instance.GetCurrentLevelData().objectSpeedMultiplier;
+            lives = baseHealth + (LevelManager.Instance.GetCurrentLevelData().additionalAsteroidHealth);
+        }
+
+        // Random hướng di chuyển với tốc độ được điều chỉnh theo level
         float pushX = Random.Range(-1f, 0);
         float pushY = Random.Range(-1f, 1f);
-        rb.linearVelocity = new Vector2(pushX, pushY).normalized * Random.Range(1f, 3f);
+        rb.linearVelocity = new Vector2(pushX, pushY).normalized * Random.Range(1f, 3f) * speedMultiplier;
     }
     private void UpdateColliderShape()
     {
@@ -55,7 +67,7 @@ public class Asteroid : MonoBehaviour
     {
         float moveX = GameManager.Instance.worldSpeed * Time.deltaTime;
         transform.position += new Vector3(-moveX, 0);
-        if (transform.position.x < -11)
+        if (transform.position.x < -10 || transform.position.y > 6 || transform.position.y < -6)
         {
             Destroy(gameObject);
         }
@@ -71,8 +83,15 @@ public class Asteroid : MonoBehaviour
             lives--;
             if (lives <= 0)
             {
+                // Phát âm thanh nổ khi bị phá hủy
+                AudioManager.Instance.PlayExplosion();
                 Instantiate(destroyEffect, transform.position, transform.rotation);
-                Destroy(gameObject);    
+                Destroy(gameObject);
+            }
+            else
+            {
+                // Phát âm thanh trúng đạn nhưng chưa hỏng
+                AudioManager.Instance.PlayHit();
             }
         }
 

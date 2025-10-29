@@ -130,6 +130,7 @@ public class PlayerController : MonoBehaviour
     {
         health -= damage;
         UIController.Instance.UpdateHealthSlider(health, maxHealth);
+        //  AudioManager.Instance.PlaySound(AudioManager.Instance.hitSource);
         spriteRenderer.material = whiteMaterial;
         StartCoroutine("ResetMaterial");
         if (health <= 0)
@@ -139,6 +140,7 @@ public class PlayerController : MonoBehaviour
             gameObject.SetActive(false);
             Instantiate(destroyEffect, transform.position, transform.rotation);
             GameManager.Instance.GameResult(false);
+            // AudioManager.Instance.PlaySound(AudioManager.Instance.poolerSource);
         }
 
     }
